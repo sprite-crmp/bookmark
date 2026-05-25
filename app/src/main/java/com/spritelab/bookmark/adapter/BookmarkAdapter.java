@@ -36,6 +36,22 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHo
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = inflater.inflate(R.layout.item_bookmark, parent, false);
+
+        view.setAlpha(0f);
+        view.setScaleX(0.8f);
+        view.setScaleY(0.8f);
+        view.setTranslationY(100f);
+
+        view.animate()
+                .alpha(1f)
+                .scaleX(1f)
+                .scaleY(1f)
+                .translationY(0f)
+                .setDuration(300)
+                .setStartDelay(viewType * 50)
+                .setInterpolator(new android.view.animation.DecelerateInterpolator())
+                .start();
+
         return new ViewHolder(view);
     }
 
