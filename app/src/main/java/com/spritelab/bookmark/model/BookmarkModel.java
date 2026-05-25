@@ -1,14 +1,12 @@
 package com.spritelab.bookmark.model;
 
-public class Bookmark {
+public class BookmarkModel {
     private String title;
     private String date;
-    private String url;
 
-    public Bookmark(String title, String date, String url) {
+    public BookmarkModel(String title, String date) {
         this.title = title;
         this.date = date;
-        this.url = url;
     }
 
     public String getTitle() {
@@ -25,14 +23,6 @@ public class Bookmark {
 
     public void setDate(String date) {
         this.date = date;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
     }
 }
 

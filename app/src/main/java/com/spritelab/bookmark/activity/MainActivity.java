@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.spritelab.bookmark.R;
 import com.spritelab.bookmark.adapter.BookmarkAdapter;
-import com.spritelab.bookmark.model.Bookmark;
+import com.spritelab.bookmark.model.BookmarkModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
     EditText etBookMark;
 
     private BookmarkAdapter adapter;
-    private final List<Bookmark> bookmarks = new ArrayList<>();
+    private final List<BookmarkModel> bookmarks = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
         rvBookMarks.setLayoutManager(new LinearLayoutManager(this));
         adapter = new BookmarkAdapter(this, bookmarks, new BookmarkAdapter.OnItemClickListener() {
             @Override
-            public void onItemClick(Bookmark bookmark, int position) {
+            public void onItemClick(BookmarkModel bookmark, int position) {
                 Toast.makeText(MainActivity.this, "Clicked: " + bookmark.getTitle(), Toast.LENGTH_SHORT).show();
             }
         });
@@ -50,9 +50,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void loadSampleData() {
-        bookmarks.add(new Bookmark("Google", "25.05.2026", "https://www.google.com"));
-        bookmarks.add(new Bookmark("StackOverflow", "24.05.2026", "https://stackoverflow.com"));
-        bookmarks.add(new Bookmark("GitHub", "23.05.2026", "https://github.com"));
+        bookmarks.add(new BookmarkModel("Google", "25.05.2026"));
+        bookmarks.add(new BookmarkModel("StackOverflow", "24.05.2026"));
+        bookmarks.add(new BookmarkModel("GitHub", "23.05.2026"));
         if (adapter != null) adapter.notifyDataSetChanged();
     }
 }

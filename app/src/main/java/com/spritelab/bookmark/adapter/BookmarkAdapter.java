@@ -10,21 +10,21 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.spritelab.bookmark.R;
-import com.spritelab.bookmark.model.Bookmark;
+import com.spritelab.bookmark.model.BookmarkModel;
 
 import java.util.List;
 
 public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHolder> {
 
     public interface OnItemClickListener {
-        void onItemClick(Bookmark bookmark, int position);
+        void onItemClick(BookmarkModel bookmark, int position);
     }
 
-    private final List<Bookmark> items;
+    private final List<BookmarkModel> items;
     private final LayoutInflater inflater;
     private final OnItemClickListener listener;
 
-    public BookmarkAdapter(Context context, List<Bookmark> items, OnItemClickListener listener) {
+    public BookmarkAdapter(Context context, List<BookmarkModel> items, OnItemClickListener listener) {
         this.items = items;
         this.inflater = LayoutInflater.from(context);
         this.listener = listener;
@@ -39,7 +39,7 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Bookmark b = items.get(position);
+        BookmarkModel b = items.get(position);
         holder.title.setText(b.getTitle());
         holder.date.setText(b.getDate());
         holder.itemView.setOnClickListener(new View.OnClickListener() {
