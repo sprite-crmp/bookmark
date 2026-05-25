@@ -11,23 +11,17 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.spritelab.bookmark.R;
 import com.spritelab.bookmark.model.BookmarkModel;
+import com.spritelab.bookmark.utils.HelpUtils;
 
 import java.util.List;
 
 public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHolder> {
-
-    public interface OnItemClickListener {
-        void onItemClick(BookmarkModel bookmark, int position);
-    }
-
     private final List<BookmarkModel> items;
     private final LayoutInflater inflater;
-    private final OnItemClickListener listener;
 
-    public BookmarkAdapter(Context context, List<BookmarkModel> items, OnItemClickListener listener) {
+    public BookmarkAdapter(Context context, List<BookmarkModel> items) {
         this.items = items;
         this.inflater = LayoutInflater.from(context);
-        this.listener = listener;
     }
 
     @NonNull
@@ -45,7 +39,7 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHo
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (listener != null) listener.onItemClick(b, holder.getAdapterPosition());
+                HelpUtils.setupDropAnimation(v, false, () -> {});
             }
         });
     }

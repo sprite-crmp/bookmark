@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.spritelab.bookmark.R;
 import com.spritelab.bookmark.adapter.BookmarkAdapter;
 import com.spritelab.bookmark.model.BookmarkModel;
+import com.spritelab.bookmark.utils.HelpUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,12 +41,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupRecyclerView() {
         rvBookMarks.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new BookmarkAdapter(this, bookmarks, new BookmarkAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(BookmarkModel bookmark, int position) {
-                Toast.makeText(MainActivity.this, "Clicked: " + bookmark.getTitle(), Toast.LENGTH_SHORT).show();
-            }
-        });
+        adapter = new BookmarkAdapter(this, bookmarks);
         rvBookMarks.setAdapter(adapter);
     }
 
