@@ -11,7 +11,8 @@
         android:layout_marginHorizontal="30dp"
         android:layout_marginTop="15dp"
         android:background="@drawable/bg_bookmark"
-        android:padding="10dp">
+        android:padding="10dp"
+        android:orientation="vertical">
 
         <TextView
             android:layout_width="wrap_content"
@@ -19,6 +20,14 @@
             android:fontFamily="@font/samsungone700c"
             android:text="Закладка"
             android:textColor="@color/black" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/samsungone500c"
+            android:text="Дата создания: 25.05.2026"
+            android:textColor="@color/low_black"
+            android:textSize="10dp"/>
 
     </LinearLayout>
 
