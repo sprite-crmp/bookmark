@@ -2,6 +2,9 @@ package com.spritelab.bookmark.activity;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -19,14 +22,18 @@ import com.spritelab.bookmark.adapter.BookmarkAdapter;
 import com.spritelab.bookmark.model.BookmarkModel;
 import com.spritelab.bookmark.utils.HelpUtils;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
     ImageView btnSettings;
     RecyclerView rvBookMarks;
     EditText etBookMark;
+    ImageView btnSend;
 
     private BookmarkAdapter adapter;
     private ItemTouchHelper itemTouchHelper;
@@ -40,10 +47,28 @@ public class MainActivity extends AppCompatActivity {
         btnSettings = findViewById(R.id.btnSettings);
         rvBookMarks = findViewById(R.id.rvBookMarks);
         etBookMark = findViewById(R.id.etBookMark);
+        btnSend = findViewById(R.id.btnSend);
 
+        listeners();
         setupRecyclerView();
-        loadSampleData();
         initDialogX();
+    }
+
+    private void listeners(){
+        HelpUtils.setupDropAnimation(btnSend, false, () -> {
+            String bookmarkText = etBookMark.getText().toString().trim();
+            if (bookmarkText.isEmpty()) {
+                Toast.makeText(this, "Введите закладку", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            Date now = new Date();
+            SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault());
+            String dateTime = sdf.format(now);
+
+            addNewBookMark(bookmarkText, dateTime);
+            etBookMark.setText("");
+        }, () -> {});
     }
 
     private void initDialogX() {
@@ -82,10 +107,8 @@ public class MainActivity extends AppCompatActivity {
         adapter.setTouchHelper(itemTouchHelper);
     }
 
-    private void loadSampleData() {
-        bookmarks.add(new BookmarkModel("Google", "25.05.2026"));
-        bookmarks.add(new BookmarkModel("StackOverflow", "24.05.2026"));
-        bookmarks.add(new BookmarkModel("GitHub", "23.05.2026"));
+    private void addNewBookMark(String name, String date){
+        bookmarks.add(new BookmarkModel(name, "Дата создания: " + date));
         if (adapter != null) adapter.notifyDataSetChanged();
     }
 }

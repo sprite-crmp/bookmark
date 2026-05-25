@@ -49,20 +49,38 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <EditText
-        android:id="@+id/etBookMark"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="55dp"
-        android:layout_marginHorizontal="50dp"
+        android:layout_marginHorizontal="30dp"
         android:layout_marginBottom="40dp"
-        android:background="@drawable/bg_edittext"
-        android:fontFamily="@font/samsungone600c"
-        android:hint="Закладка"
-        android:padding="10dp"
-        android:paddingStart="20dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent">
+
+        <EditText
+            android:id="@+id/etBookMark"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_marginEnd="10dp"
+            android:background="@drawable/bg_edittext"
+            android:fontFamily="@font/samsungone600c"
+            android:hint="Закладка"
+            android:padding="10dp"
+            android:paddingStart="20dp" />
+
+        <ImageView
+            android:id="@+id/btnSend"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/btn_send"
+            android:padding="10dp"
+            android:background="@drawable/bg_edittext" />
+
+    </LinearLayout>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
