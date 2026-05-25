@@ -1,6 +1,7 @@
 package com.spritelab.bookmark.utils;
 
 import android.os.CountDownTimer;
+import android.os.Handler;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
@@ -22,7 +23,15 @@ public class HelpUtils {
         }.start();
     }
 
-    public static void setupDropAnimation(View view, boolean btnCoolDown, Runnable onClickAction) {
+    public static void setupDropAnimation(View view, boolean btnCoolDown, Runnable onClickAction, Runnable onLongClickAction) {
+        Handler longPressHandler = new Handler();
+        Runnable longPressRunnable = () -> {
+            if (onLongClickAction != null) {
+                onLongClickAction.run();
+                view.setTag(androidx.core.R.id.tag_transition_group, true);
+            }
+        };
+
         view.setOnTouchListener(new View.OnTouchListener() {
             private boolean isPressed = false;
             private boolean isInside = true;
@@ -38,15 +47,22 @@ public class HelpUtils {
                         startX = event.getX();
                         startY = event.getY();
                         animateLiquidDrop(v);
+                        v.setTag(androidx.core.R.id.tag_transition_group, false);
+                        if (onLongClickAction != null) {
+                            longPressHandler.postDelayed(longPressRunnable, 500);
+                        }
                         break;
 
                     case MotionEvent.ACTION_MOVE:
                         if (isPressed) {
                             float currentX = event.getX();
                             float currentY = event.getY();
-
                             isInside = currentX >= 0 && currentX <= v.getWidth() &&
                                     currentY >= 0 && currentY <= v.getHeight();
+
+                            if (!isInside) {
+                                longPressHandler.removeCallbacks(longPressRunnable);
+                            }
 
                             float deltaX = (currentX - startX) / v.getWidth();
                             float deltaY = (currentY - startY) / v.getHeight();
@@ -71,9 +87,11 @@ public class HelpUtils {
                         break;
 
                     case MotionEvent.ACTION_UP:
+                        longPressHandler.removeCallbacks(longPressRunnable);
                         if (isPressed) {
                             isPressed = false;
-                            if (isInside) {
+                            boolean isLongClickTriggered = (boolean) v.getTag(androidx.core.R.id.tag_transition_group);
+                            if (isInside && !isLongClickTriggered) {
                                 animateReleaseWithEffect(v);
                                 if (onClickAction != null) {
                                     if (isBtnCoolDown) return false;
@@ -88,6 +106,7 @@ public class HelpUtils {
 
                     case MotionEvent.ACTION_CANCEL:
                     case MotionEvent.ACTION_OUTSIDE:
+                        longPressHandler.removeCallbacks(longPressRunnable);
                         if (isPressed) {
                             isPressed = false;
                             animateReturnToNormal(v);
