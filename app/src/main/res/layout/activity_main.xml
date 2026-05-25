@@ -70,6 +70,7 @@
             android:fontFamily="@font/samsungone600c"
             android:hint="Закладка"
             android:padding="10dp"
+            android:inputType="textCapSentences|textMultiLine"
             android:paddingStart="20dp" />
 
         <ImageView
