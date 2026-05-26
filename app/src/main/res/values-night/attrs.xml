@@ -1,4 +1,5 @@
 <resources>
     <attr name="appName" format="color" />
     <attr name="editTextBackground" />
+    <attr name="settingsBtn" />
 </resources>

@@ -10,7 +10,7 @@
         android:label="@string/app_name"
         android:roundIcon="@drawable/btn_send"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Light">
+        android:theme="@style/Theme.BookMark">
         <activity
             android:name=".activity.MainActivity"
             android:exported="true">

@@ -1,8 +1,9 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <style name="Theme.Light" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Theme.BookMark" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="background">@color/background</item>
         <item name="appName">@color/app_name_text</item>
         <item name="editTextBackground">@drawable/bg_edittext</item>
+        <item name="settingsBtn">@drawable/btn_black_settings</item>
 
         <item name="android:windowLightStatusBar">true</item>
     </style>
