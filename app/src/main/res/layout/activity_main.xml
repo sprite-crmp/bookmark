@@ -25,13 +25,14 @@
             android:layout_weight="1"
             android:fontFamily="@font/samsungone800c"
             android:text="BookMark"
-            android:textColor="#161A1D"
+            android:textColor="?attr/appName"
             android:textSize="20dp" />
 
         <ImageView
             android:id="@+id/btnSettings"
             android:layout_width="30dp"
             android:layout_height="30dp"
+            android:tint="@color/white"
             android:src="@drawable/btn_black_settings" />
 
     </LinearLayout>
@@ -69,10 +70,12 @@
             android:layout_weight="1"
             android:layout_marginEnd="10dp"
             android:maxLength="560"
-            android:background="@drawable/bg_edittext"
+            android:background="?attr/editTextBackground"
             android:fontFamily="@font/samsungone600c"
             android:hint="Закладка"
             android:padding="10dp"
+            android:textColor="?attr/appName"
+            android:textColorHint="?attr/appName"
             android:inputType="textCapSentences|textMultiLine"
             android:paddingStart="20dp" />
 
@@ -82,7 +85,7 @@
             android:layout_height="50dp"
             android:src="@drawable/btn_send"
             android:padding="10dp"
-            android:background="@drawable/bg_edittext" />
+            android:background="?attr/editTextBackground" />
 
     </LinearLayout>
 

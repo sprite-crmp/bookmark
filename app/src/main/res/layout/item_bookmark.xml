@@ -20,7 +20,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/samsungone700c"
             android:text="Закладка"
-            android:textColor="@color/black" />
+            android:textColor="?attr/appName" />
 
         <TextView
             android:id="@+id/tvDate"
@@ -28,7 +28,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/samsungone500c"
             android:text="Дата создания: 25.05.2026"
-            android:textColor="@color/low_black"
+            android:textColor="?attr/appName"
             android:textSize="10dp"/>
 
     </LinearLayout>
