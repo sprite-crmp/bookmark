@@ -1,6 +1,7 @@
 package com.spritelab.bookmark.activity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -10,6 +11,7 @@ import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -22,6 +24,7 @@ import com.kongzue.dialogx.style.IOSStyle;
 import com.spritelab.bookmark.R;
 import com.spritelab.bookmark.adapter.BookmarkAdapter;
 import com.spritelab.bookmark.model.BookmarkModel;
+import com.spritelab.bookmark.model.ConfigModel;
 import com.spritelab.bookmark.utils.HelpUtils;
 
 import java.io.File;
@@ -59,12 +62,19 @@ public class MainActivity extends AppCompatActivity {
         btnSend = findViewById(R.id.btnSend);
 
         listeners();
+        loadConfig();
         setupRecyclerView();
         loadFromJson();
         initDialogX();
     }
 
-    private void listeners(){
+    private void listeners() {
+        HelpUtils.setupDropAnimation(btnSettings, false, () -> {
+            Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+            startActivity(intent);
+            finish();
+        }, () -> {});
+
         HelpUtils.setupDropAnimation(btnSend, false, () -> {
             String bookmarkText = etBookMark.getText().toString().trim();
             if (bookmarkText.isEmpty()) {
@@ -129,8 +139,40 @@ public class MainActivity extends AppCompatActivity {
 
             Log.i(TAG, "Данные загружены из bookmarks.json");
         } catch (IOException e) {
-            Log.e(TAG, "Ошибка загрузки: " + e.getMessage());
+            Log.e(TAG, "Ошибка загрузки bookmarks.json: " + e.getMessage());
             e.printStackTrace();
+        }
+    }
+
+    private void loadConfig() {
+        File file = new File(getExternalFilesDir(null), "config.json");
+        if (!file.exists()) return;
+
+        try (FileInputStream fis = new FileInputStream(file)) {
+            byte[] data = new byte[(int) file.length()];
+            fis.read(data);
+            String json = new String(data);
+
+            Gson gson = new Gson();
+            ConfigModel[] loaded = gson.fromJson(json, ConfigModel[].class);
+
+            if (loaded.length > 0) {
+                int theme = loaded[0].getTheme();
+                switch(theme) {
+                    case 0:
+                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                        break;
+                    case 1:
+                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                        break;
+                    case 2:
+                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+                        break;
+                }
+            }
+
+        } catch (IOException e) {
+            Log.e(TAG, "Ошибка загрузки: " + e.getMessage());
         }
     }
 

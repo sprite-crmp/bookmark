@@ -1,5 +1,6 @@
 <resources>
     <attr name="appName" format="color" />
     <attr name="editTextBackground" format="reference" />
-    <attr name="settingsBtn" format="reference" />
+    <attr name="btnSettings" format="reference" />
+    <attr name="btnHome" format="reference" />
 </resources>

@@ -3,7 +3,8 @@
         <item name="background">@color/background</item>
         <item name="appName">@color/app_name_text</item>
         <item name="editTextBackground">@drawable/bg_black_edittext</item>
-        <item name="settingsBtn">@drawable/btn_white_settings</item>
+        <item name="btnSettings">@drawable/btn_white_settings</item>
+        <item name="btnHome">@drawable/btn_white_home</item>
 
         <item name="android:windowLightStatusBar">false</item>
     </style>
