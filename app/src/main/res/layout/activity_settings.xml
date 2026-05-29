@@ -42,6 +42,7 @@
         android:layout_height="0dp"
         android:layout_marginHorizontal="30dp"
         android:layout_marginTop="10dp"
+        android:layout_marginBottom="50dp"
         android:scrollbarThumbVertical="@null"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -78,4 +79,27 @@
 
         </LinearLayout>
     </ScrollView>
+
+    <TextView
+        android:id="@+id/tvAutor"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:fontFamily="@font/samsungone700"
+        android:gravity="center"
+        android:text="Created by SpriteLab"
+        android:textSize="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageView
+        android:id="@+id/imgHeart"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginBottom="30dp"
+        android:src="@drawable/img_heart"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/tvAutor"
+        app:layout_constraintStart_toStartOf="@+id/tvAutor" />
 </androidx.constraintlayout.widget.ConstraintLayout>
