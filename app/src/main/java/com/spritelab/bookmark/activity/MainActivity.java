@@ -5,13 +5,13 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.util.Log;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.cardview.widget.CardView;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.google.gson.Gson;
@@ -32,10 +32,12 @@ public class MainActivity extends AppCompatActivity {
     ImageView btnSettings;
     EditText etBookMark;
     ImageView btnSend;
-    CardView cardNotes, cardTasks;
+    View cardNotes, cardTasks;
+    CardView bgNotes, bgTasks;
 
     private static final String TAG = "class:MainActivity";
     private boolean cooldown;
+    private boolean isNotesSelected = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,13 +47,18 @@ public class MainActivity extends AppCompatActivity {
         btnSettings = findViewById(R.id.btnSettings);
         etBookMark = findViewById(R.id.etBookMark);
         btnSend = findViewById(R.id.btnSend);
+        
         cardNotes = findViewById(R.id.card_notes);
         cardTasks = findViewById(R.id.card_tasks);
+        bgNotes = findViewById(R.id.bg_notes);
+        bgTasks = findViewById(R.id.bg_tasks);
 
         loadConfig();
         initDialogX();
         listeners();
-        updateTabs(true);
+        bgNotes.setAlpha(1f);
+        bgTasks.setAlpha(0f);
+        
         replaceFragment(new NotesFragment());
     }
 
@@ -74,9 +81,7 @@ public class MainActivity extends AppCompatActivity {
                         }
 
                         @Override
-                        public void onTick(long millisUntilFinished) {
-
-                        }
+                        public void onTick(long millisUntilFinished) {}
                     }.start();
                     PopTip.show("Введите закладку").iconWarning();
                 }
@@ -91,27 +96,25 @@ public class MainActivity extends AppCompatActivity {
         }, () -> {});
 
         HelpUtils.setupDropAnimation(cardNotes, false, () -> {
-            updateTabs(true);
-            replaceFragment(new NotesFragment());
+            if (!isNotesSelected) {
+                animateTabSwitch(true);
+                replaceFragment(new NotesFragment());
+            }
         }, () -> {});
 
         HelpUtils.setupDropAnimation(cardTasks, false, () -> {
-            updateTabs(false);
-            // Если в будущем появится TasksFragment, здесь можно будет вызывать: replaceFragment(new TasksFragment());
+            if (isNotesSelected) {
+                animateTabSwitch(false);
+                // replaceFragment(new TasksFragment());
+            }
         }, () -> {});
     }
 
-    private void updateTabs(boolean isNotesActive) {
-        int activeColor = ContextCompat.getColor(this, R.color.aluminum);
-        int transparentColor = ContextCompat.getColor(this, R.color.transparent);
-
-        if (isNotesActive) {
-            cardNotes.setCardBackgroundColor(activeColor);
-            cardTasks.setCardBackgroundColor(transparentColor);
-        } else {
-            cardNotes.setCardBackgroundColor(transparentColor);
-            cardTasks.setCardBackgroundColor(activeColor);
-        }
+    private void animateTabSwitch(boolean isNotesActive) {
+        this.isNotesSelected = isNotesActive;
+        long duration = 180;
+        bgNotes.animate().alpha(isNotesActive ? 1f : 0f).setDuration(duration).start();
+        bgTasks.animate().alpha(isNotesActive ? 0f : 1f).setDuration(duration).start();
     }
 
     private void loadConfig() {
@@ -126,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
             Gson gson = new Gson();
             ConfigModel[] loaded = gson.fromJson(json, ConfigModel[].class);
 
-            if (loaded.length > 0) {
+            if (loaded != null && loaded.length > 0) {
                 int theme = loaded[0].getTheme();
                 switch(theme) {
                     case 0:
