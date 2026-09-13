@@ -75,7 +75,7 @@
             android:padding="10dp"
             android:paddingStart="20dp"
             android:textColor="?attr/appName"
-            android:textColorHint="?attr/appName" />
+            android:textColorHint="?attr/appNameTransp" />
 
         <ImageView
             android:id="@+id/btnSend"
