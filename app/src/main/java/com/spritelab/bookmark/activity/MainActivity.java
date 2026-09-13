@@ -80,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
                         public void onTick(long millisUntilFinished) {}
                     }.start();
                     if (activeFragment == 1) PopTip.show("Введите текст заметки").iconWarning();
-                    if (activeFragment == 2) PopTip.show("Введите текст задачи").iconWarning();
+                    if (activeFragment == 2) PopTip.show("Введите имя задачи").iconWarning();
                 }
                 return;
             }
@@ -114,8 +114,8 @@ public class MainActivity extends AppCompatActivity {
     private void animateTabSwitch(boolean isNotesActive) {
         this.isNotesSelected = isNotesActive;
         long duration = 180;
-        if (isNotesActive) etBookMark.setHint("Заметка");
-        else etBookMark.setHint("Задача");
+        if (isNotesActive) etBookMark.setHint("Введите текст заметки");
+        else etBookMark.setHint("Введите имя задачи");
         bgNotes.animate().alpha(isNotesActive ? 1f : 0f).setDuration(duration).start();
         bgTasks.animate().alpha(isNotesActive ? 0f : 1f).setDuration(duration).start();
     }
