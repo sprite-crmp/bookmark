@@ -3,4 +3,6 @@
     <attr name="editTextBackground" format="reference" />
     <attr name="btnSettings" format="reference" />
     <attr name="btnHome" format="reference" />
+    <attr name="btnNotes" format="reference" />
+    <attr name="btnTasks" format="reference" />
 </resources>

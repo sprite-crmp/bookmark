@@ -6,6 +6,8 @@
         <item name="editTextBackground">@drawable/bg_edittext</item>
         <item name="btnSettings">@drawable/btn_black_settings</item>
         <item name="btnHome">@drawable/btn_black_home</item>
+        <item name="btnTasks">@drawable/btn_black_tasks</item>
+        <item name="btnNotes">@drawable/btn_black_notes</item>
 
         <item name="android:windowLightStatusBar">true</item>
     </style>
