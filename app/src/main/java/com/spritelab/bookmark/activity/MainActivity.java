@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -14,21 +13,14 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 
-import com.google.gson.Gson;
 import com.kongzue.dialogx.DialogX;
 import com.kongzue.dialogx.dialogs.PopTip;
 import com.kongzue.dialogx.style.IOSStyle;
 import com.spritelab.bookmark.R;
+import com.spritelab.bookmark.utils.DatabaseHelper;
 import com.spritelab.bookmark.fragment.NotesFragment;
 import com.spritelab.bookmark.fragment.TasksFragment;
-import com.spritelab.bookmark.model.ConfigModel;
 import com.spritelab.bookmark.utils.HelpUtils;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-
-import kotlinx.coroutines.scheduling.Task;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -99,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
                 ((NotesFragment) fragment).addNewBookMark(bookmarkText);
                 etBookMark.setText("");
             } else if (activeFragment == 2 && fragment instanceof TasksFragment) {
-
+                // Future task implementation
             }
 
         }, () -> {});
@@ -129,34 +121,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void loadConfig() {
-        File file = new File(getExternalFilesDir(null), "config.json");
-        if (!file.exists()) return;
-
-        try (FileInputStream fis = new FileInputStream(file)) {
-            byte[] data = new byte[(int) file.length()];
-            fis.read(data);
-            String json = new String(data);
-
-            Gson gson = new Gson();
-            ConfigModel[] loaded = gson.fromJson(json, ConfigModel[].class);
-
-            if (loaded != null && loaded.length > 0) {
-                int theme = loaded[0].getTheme();
-                switch(theme) {
-                    case 0:
-                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-                        break;
-                    case 1:
-                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-                        break;
-                    case 2:
-                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
-                        break;
-                }
-            }
-
-        } catch (IOException e) {
-            Log.e(TAG, "Ошибка загрузки: " + e.getMessage());
+        int theme = DatabaseHelper.getInstance(this).getTheme();
+        switch(theme) {
+            case 0:
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                break;
+            case 1:
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                break;
+            case 2:
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+                break;
         }
     }
 
