@@ -24,8 +24,8 @@ import com.spritelab.bookmark.utils.HelpUtils;
 
 public class MainActivity extends AppCompatActivity {
 
-    ImageView btnSettings;
     EditText etBookMark;
+    ImageView btnSettings;
     ImageView btnSend;
     View cardNotes, cardTasks;
     CardView bgNotes, bgTasks;
@@ -67,6 +67,15 @@ public class MainActivity extends AppCompatActivity {
         HelpUtils.setupDropAnimation(btnSend, false, () -> {
             String bookmarkText = etBookMark.getText().toString().trim();
             int activeFragment = getActiveFragment();
+            
+            Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container_view);
+            
+            if (activeFragment == 2 && fragment instanceof TasksFragment && ((TasksFragment) fragment).isDialogVisible()) {
+                ((TasksFragment) fragment).onSendPressed(bookmarkText);
+                etBookMark.setText("");
+                return;
+            }
+
             if (bookmarkText.isEmpty()) {
                 if (!cooldown) {
                     cooldown = true;
@@ -85,13 +94,12 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
 
-            Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container_view);
-
             if (activeFragment == 1 && fragment instanceof NotesFragment) {
                 ((NotesFragment) fragment).addNewBookMark(bookmarkText);
                 etBookMark.setText("");
             } else if (activeFragment == 2 && fragment instanceof TasksFragment) {
-                // Future task implementation
+                ((TasksFragment) fragment).onSendPressed(bookmarkText);
+                etBookMark.setText("");
             }
 
         }, () -> {});

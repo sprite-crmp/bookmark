@@ -6,15 +6,20 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.spritelab.bookmark.model.BookmarkModel;
+import com.spritelab.bookmark.model.TaskModel;
+import com.spritelab.bookmark.model.TaskPointModel;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "bookmark.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2; // Upgraded version to invoke onUpgrade
 
     // Tables
     private static final String TABLE_CONFIG = "config";
@@ -33,9 +38,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     // Tasks
     private static final String TASK_ID = "id";
     private static final String TASK_TITLE = "title";
+    private static final String TASK_DATE = "date";
+    private static final String TASK_POINTS = "points";
     private static final String TASK_STATUS = "status";
 
     private static DatabaseHelper instance;
+    private final Gson gson = new Gson();
 
     public static synchronized DatabaseHelper getInstance(Context context) {
         if (instance == null) {
@@ -62,6 +70,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String createTasks = "CREATE TABLE " + TABLE_TASKS + "(" +
                 TASK_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 TASK_TITLE + " TEXT, " +
+                TASK_DATE + " TEXT, " +
+                TASK_POINTS + " TEXT, " +
                 TASK_STATUS + " INTEGER DEFAULT 0)";
 
         db.execSQL(createConfig);
@@ -96,6 +106,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         return theme;
     }
+
+    // --- Bookmarks (Notes) ---
 
     public long addBookmark(BookmarkModel bookmark) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -139,6 +151,76 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 v.put(BOOK_TITLE, b.getTitle());
                 v.put(BOOK_DATE, b.getDate());
                 db.insert(TABLE_BOOKMARKS, null, v);
+            }
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+    }
+
+    // --- Tasks ---
+
+    public long addTask(TaskModel task) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(TASK_TITLE, task.getTitle());
+        values.put(TASK_DATE, task.getDate());
+        values.put(TASK_POINTS, gson.toJson(task.getPoints()));
+        values.put(TASK_STATUS, 0);
+        return db.insert(TABLE_TASKS, null, values);
+    }
+
+    public List<TaskModel> getAllTasks() {
+        List<TaskModel> list = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_TASKS + " ORDER BY " + TASK_ID + " DESC", null);
+
+        if (cursor.moveToFirst()) {
+            Type type = new TypeToken<List<TaskPointModel>>(){}.getType();
+            do {
+                String pointsJson = cursor.getString(3);
+                List<TaskPointModel> points = gson.fromJson(pointsJson, type);
+                if (points == null) {
+                    points = new ArrayList<>();
+                }
+                TaskModel t = new TaskModel(
+                        cursor.getInt(0),
+                        cursor.getString(1),
+                        cursor.getString(2),
+                        points
+                );
+                list.add(t);
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        return list;
+    }
+
+    public void updateTask(TaskModel task) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(TASK_TITLE, task.getTitle());
+        values.put(TASK_DATE, task.getDate());
+        values.put(TASK_POINTS, gson.toJson(task.getPoints()));
+        db.update(TABLE_TASKS, values, TASK_ID + " = ?", new String[]{String.valueOf(task.getId())});
+    }
+
+    public void deleteTask(int id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_TASKS, TASK_ID + " = ?", new String[]{String.valueOf(id)});
+    }
+
+    public void updateTasksOrder(List<TaskModel> list) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.beginTransaction();
+        try {
+            db.delete(TABLE_TASKS, null, null);
+            for (TaskModel t : list) {
+                ContentValues v = new ContentValues();
+                v.put(TASK_TITLE, t.getTitle());
+                v.put(TASK_DATE, t.getDate());
+                v.put(TASK_POINTS, gson.toJson(t.getPoints()));
+                db.insert(TABLE_TASKS, null, v);
             }
             db.setTransactionSuccessful();
         } finally {

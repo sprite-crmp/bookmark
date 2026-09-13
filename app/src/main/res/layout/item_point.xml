@@ -2,26 +2,29 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="20dp"
+    android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:layout_marginHorizontal="5dp"
-    android:layout_marginTop="5dp">
+    android:paddingVertical="4dp">
 
     <ImageView
         android:id="@+id/imageView"
-        android:layout_width="15dp"
-        android:layout_height="15dp"
+        android:layout_width="18dp"
+        android:layout_height="18dp"
         app:srcCompat="@drawable/img_yes"
         android:layout_gravity="center_vertical"
-        android:background=""/>
+        android:background="?android:attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"/>
 
     <TextView
+        android:id="@+id/tvPointTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:text="Создать таблицу notes"
         android:textColor="?attr/appName"
-        android:paddingLeft="5dp"
-        android:fontFamily="@font/samsungone800c"/>
+        android:paddingLeft="8dp"
+        android:fontFamily="@font/samsungone700c"
+        android:textSize="14sp"/>
 
 </LinearLayout>
