@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.kongzue.dialogx.dialogs.MessageDialog;
 import com.spritelab.bookmark.R;
-import com.spritelab.bookmark.activity.MainActivity;
+import com.spritelab.bookmark.fragment.NotesFragment;
 import com.spritelab.bookmark.model.BookmarkModel;
 import com.spritelab.bookmark.utils.HelpUtils;
 
@@ -69,7 +69,7 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHo
                         if (currentPosition != RecyclerView.NO_POSITION) {
                             items.remove(currentPosition);
                             notifyItemRemoved(currentPosition);
-                            MainActivity.saveToJson(inflater.getContext(), items);
+                            NotesFragment.saveToJson(inflater.getContext(), items);
                         }
                         return false;
                     });
