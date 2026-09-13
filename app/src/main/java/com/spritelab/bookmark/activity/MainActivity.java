@@ -20,12 +20,15 @@ import com.kongzue.dialogx.dialogs.PopTip;
 import com.kongzue.dialogx.style.IOSStyle;
 import com.spritelab.bookmark.R;
 import com.spritelab.bookmark.fragment.NotesFragment;
+import com.spritelab.bookmark.fragment.TasksFragment;
 import com.spritelab.bookmark.model.ConfigModel;
 import com.spritelab.bookmark.utils.HelpUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+
+import kotlinx.coroutines.scheduling.Task;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -71,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
 
         HelpUtils.setupDropAnimation(btnSend, false, () -> {
             String bookmarkText = etBookMark.getText().toString().trim();
+            int activeFragment = getActiveFragment();
             if (bookmarkText.isEmpty()) {
                 if (!cooldown) {
                     cooldown = true;
@@ -83,16 +87,21 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void onTick(long millisUntilFinished) {}
                     }.start();
-                    PopTip.show("Введите закладку").iconWarning();
+                    if (activeFragment == 1) PopTip.show("Введите текст заметки").iconWarning();
+                    if (activeFragment == 2) PopTip.show("Введите текст задачи").iconWarning();
                 }
                 return;
             }
 
-            NotesFragment fragment = (NotesFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container_view);
-            if (fragment != null) {
-                fragment.addNewBookMark(bookmarkText);
+            Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container_view);
+
+            if (activeFragment == 1 && fragment instanceof NotesFragment) {
+                ((NotesFragment) fragment).addNewBookMark(bookmarkText);
                 etBookMark.setText("");
+            } else if (activeFragment == 2 && fragment instanceof TasksFragment) {
+
             }
+
         }, () -> {});
 
         HelpUtils.setupDropAnimation(cardNotes, false, () -> {
@@ -105,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
         HelpUtils.setupDropAnimation(cardTasks, false, () -> {
             if (isNotesSelected) {
                 animateTabSwitch(false);
-                // replaceFragment(new TasksFragment());
+                replaceFragment(new TasksFragment());
             }
         }, () -> {});
     }
@@ -113,6 +122,8 @@ public class MainActivity extends AppCompatActivity {
     private void animateTabSwitch(boolean isNotesActive) {
         this.isNotesSelected = isNotesActive;
         long duration = 180;
+        if (isNotesActive) etBookMark.setHint("Заметка");
+        else etBookMark.setHint("Задача");
         bgNotes.animate().alpha(isNotesActive ? 1f : 0f).setDuration(duration).start();
         bgTasks.animate().alpha(isNotesActive ? 0f : 1f).setDuration(duration).start();
     }
@@ -160,5 +171,17 @@ public class MainActivity extends AppCompatActivity {
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container_view, fragment)
                 .commit();
+    }
+
+    private Integer getActiveFragment() {
+        Fragment currentFragment = getSupportFragmentManager()
+                .findFragmentById(R.id.fragment_container_view);
+
+        if (currentFragment instanceof NotesFragment) {
+            return 1;
+        } else if (currentFragment instanceof TasksFragment) {
+            return 2;
+        }
+        return 0;
     }
 }

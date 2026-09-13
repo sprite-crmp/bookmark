@@ -116,6 +116,12 @@ public class NotesFragment extends Fragment {
             }
 
             @Override
+            public void clearView(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
+                super.clearView(recyclerView, viewHolder);
+                saveToJson(getContext(), bookmarks);
+            }
+
+            @Override
             public boolean isLongPressDragEnabled() {
                 return false;
             }
