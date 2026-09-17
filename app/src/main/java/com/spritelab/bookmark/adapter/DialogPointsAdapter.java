@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.spritelab.bookmark.R;
 import com.spritelab.bookmark.model.TaskPointModel;
 
+import java.util.Collections;
 import java.util.List;
 
 public class DialogPointsAdapter extends RecyclerView.Adapter<DialogPointsAdapter.ViewHolder> {
@@ -22,6 +23,19 @@ public class DialogPointsAdapter extends RecyclerView.Adapter<DialogPointsAdapte
     public DialogPointsAdapter(Context context, List<TaskPointModel> items) {
         this.items = items;
         this.inflater = LayoutInflater.from(context);
+    }
+
+    public void onItemMove(int fromPosition, int toPosition) {
+        if (fromPosition < toPosition) {
+            for (int i = fromPosition; i < toPosition; i++) {
+                Collections.swap(items, i, i + 1);
+            }
+        } else {
+            for (int i = fromPosition; i > toPosition; i--) {
+                Collections.swap(items, i, i - 1);
+            }
+        }
+        notifyItemMoved(fromPosition, toPosition);
     }
 
     @NonNull
@@ -43,7 +57,7 @@ public class DialogPointsAdapter extends RecyclerView.Adapter<DialogPointsAdapte
         return items.size();
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView imageView;
         TextView tvPointTitle;
 

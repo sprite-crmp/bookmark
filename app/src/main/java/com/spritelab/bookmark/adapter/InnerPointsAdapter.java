@@ -15,6 +15,7 @@ import com.spritelab.bookmark.model.TaskModel;
 import com.spritelab.bookmark.model.TaskPointModel;
 import com.spritelab.bookmark.utils.DatabaseHelper;
 
+import java.util.Collections;
 import java.util.List;
 
 public class InnerPointsAdapter extends RecyclerView.Adapter<InnerPointsAdapter.ViewHolder> {
@@ -28,6 +29,19 @@ public class InnerPointsAdapter extends RecyclerView.Adapter<InnerPointsAdapter.
         this.parentTask = parentTask;
         this.inflater = LayoutInflater.from(context);
         this.onStatusChanged = onStatusChanged;
+    }
+
+    public void onItemMove(int fromPosition, int toPosition) {
+        if (fromPosition < toPosition) {
+            for (int i = fromPosition; i < toPosition; i++) {
+                Collections.swap(items, i, i + 1);
+            }
+        } else {
+            for (int i = fromPosition; i > toPosition; i--) {
+                Collections.swap(items, i, i - 1);
+            }
+        }
+        notifyItemMoved(fromPosition, toPosition);
     }
 
     @NonNull
@@ -58,7 +72,7 @@ public class InnerPointsAdapter extends RecyclerView.Adapter<InnerPointsAdapter.
         return items.size();
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView imageView;
         TextView tvPointTitle;
 

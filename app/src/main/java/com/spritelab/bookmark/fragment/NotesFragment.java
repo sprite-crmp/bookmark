@@ -77,7 +77,6 @@ public class NotesFragment extends Fragment {
             @Override
             public void clearView(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
                 super.clearView(recyclerView, viewHolder);
-                // Save the new order to DB
                 DatabaseHelper.getInstance(getContext()).updateBookmarksOrder(bookmarks);
             }
 
@@ -99,8 +98,7 @@ public class NotesFragment extends Fragment {
 
         BookmarkModel newBookmark = new BookmarkModel(name, "Дата создания: " + dateTime);
         DatabaseHelper.getInstance(getContext()).addBookmark(newBookmark);
-        
-        // Refresh list from DB to get the ID
+
         loadFromDb();
     }
 }

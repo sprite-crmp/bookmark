@@ -31,6 +31,7 @@ import com.spritelab.bookmark.utils.HelpUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -117,7 +118,6 @@ public class TasksFragment extends Fragment {
         adapter = new TasksAdapter(getContext(), tasks);
         rvTasks.setAdapter(adapter);
 
-        // Main tasks list: Only UP/DOWN for drag, NO SWIPE (user doesn't want whole task deleted by swipe)
         ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN, 0) {
             @Override
             public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
@@ -152,11 +152,13 @@ public class TasksFragment extends Fragment {
         dialogPointsAdapter = new DialogPointsAdapter(getContext(), currentNewPoints);
         rvDialogPoints.setAdapter(dialogPointsAdapter);
 
-        // Swipe to delete for points being created in the dialog
-        ItemTouchHelper.SimpleCallback swipeCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+        ItemTouchHelper.SimpleCallback dialogCallback = new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN, ItemTouchHelper.LEFT) {
             @Override
             public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
-                return false;
+                int fromPosition = viewHolder.getAdapterPosition();
+                int toPosition = target.getAdapterPosition();
+                dialogPointsAdapter.onItemMove(fromPosition, toPosition);
+                return true;
             }
 
             @Override
@@ -168,7 +170,7 @@ public class TasksFragment extends Fragment {
                 }
             }
         };
-        new ItemTouchHelper(swipeCallback).attachToRecyclerView(rvDialogPoints);
+        new ItemTouchHelper(dialogCallback).attachToRecyclerView(rvDialogPoints);
     }
 
     private void loadFromDb() {

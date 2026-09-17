@@ -67,16 +67,17 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.ViewHolder> 
         InnerPointsAdapter innerPointsAdapter = new InnerPointsAdapter(inflater.getContext(), task, null);
         holder.rvTaskPoints.setAdapter(innerPointsAdapter);
 
-        // Remove any existing helper to prevent multiple attachments
         if (holder.innerItemTouchHelper != null) {
             holder.innerItemTouchHelper.attachToRecyclerView(null);
         }
 
-        // Add swipe to delete for inner points
-        ItemTouchHelper.SimpleCallback swipeCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+        ItemTouchHelper.SimpleCallback innerCallback = new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN, ItemTouchHelper.LEFT) {
             @Override
             public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
-                return false;
+                int fromPosition = viewHolder.getAdapterPosition();
+                int toPosition = target.getAdapterPosition();
+                innerPointsAdapter.onItemMove(fromPosition, toPosition);
+                return true;
             }
 
             @Override
@@ -88,8 +89,14 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.ViewHolder> 
                     DatabaseHelper.getInstance(inflater.getContext()).updateTask(task);
                 }
             }
+
+            @Override
+            public void clearView(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
+                super.clearView(recyclerView, viewHolder);
+                DatabaseHelper.getInstance(inflater.getContext()).updateTask(task);
+            }
         };
-        holder.innerItemTouchHelper = new ItemTouchHelper(swipeCallback);
+        holder.innerItemTouchHelper = new ItemTouchHelper(innerCallback);
         holder.innerItemTouchHelper.attachToRecyclerView(holder.rvTaskPoints);
 
         HelpUtils.setupDropAnimation(holder.itemView, false,
