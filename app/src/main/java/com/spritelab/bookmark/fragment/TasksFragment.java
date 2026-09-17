@@ -11,6 +11,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -44,6 +45,7 @@ public class TasksFragment extends Fragment {
     private EditText etBookMarkInner;
     private ImageView btnSendInner;
     private View btnCancel;
+    private View globalTouchBlocker;
 
     private TasksAdapter adapter;
     private DialogPointsAdapter dialogPointsAdapter;
@@ -53,6 +55,8 @@ public class TasksFragment extends Fragment {
     private final List<TaskPointModel> currentNewPoints = new ArrayList<>();
     private String currentTaskTitle = "";
     private boolean cooldown = false;
+
+    private OnBackPressedCallback backPressedCallback;
 
     public TasksFragment() {}
 
@@ -73,7 +77,12 @@ public class TasksFragment extends Fragment {
         btnSendInner = view.findViewById(R.id.btn_send);
         btnCancel = view.findViewById(R.id.btn_cancel);
         
+        if (getActivity() != null) {
+            globalTouchBlocker = getActivity().findViewById(R.id.global_touch_blocker);
+        }
+        
         dialogAddTask.setVisibility(View.GONE);
+        if (globalTouchBlocker != null) globalTouchBlocker.setVisibility(View.GONE);
 
         setupRecyclerView();
         setupDialogRecyclerView();
@@ -87,6 +96,20 @@ public class TasksFragment extends Fragment {
         HelpUtils.setupDropAnimation(btnCancel, false, () -> {
             hideDialog();
         }, () -> {});
+
+        setupBackPressed();
+    }
+
+    private void setupBackPressed() {
+        backPressedCallback = new OnBackPressedCallback(false) {
+            @Override
+            public void handleOnBackPressed() {
+                if (isDialogVisible()) {
+                    hideDialog();
+                }
+            }
+        };
+        requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), backPressedCallback);
     }
 
     private void setupRecyclerView() {
@@ -190,6 +213,10 @@ public class TasksFragment extends Fragment {
     }
 
     private void showDialog() {
+        if (globalTouchBlocker != null) {
+            globalTouchBlocker.setVisibility(View.VISIBLE);
+        }
+
         dialogAddTask.setScaleX(0.8f);
         dialogAddTask.setScaleY(0.8f);
         dialogAddTask.setAlpha(0f);
@@ -201,9 +228,17 @@ public class TasksFragment extends Fragment {
                 .setDuration(250)
                 .setInterpolator(new OvershootInterpolator(1.2f))
                 .start();
+        
+        if (backPressedCallback != null) {
+            backPressedCallback.setEnabled(true);
+        }
     }
 
     private void hideDialog() {
+        if (globalTouchBlocker != null) {
+            globalTouchBlocker.setVisibility(View.GONE);
+        }
+
         dialogAddTask.animate()
                 .scaleX(0.8f)
                 .scaleY(0.8f)
@@ -218,6 +253,10 @@ public class TasksFragment extends Fragment {
                     dialogPointsAdapter.notifyDataSetChanged();
                 })
                 .start();
+
+        if (backPressedCallback != null) {
+            backPressedCallback.setEnabled(false);
+        }
     }
 
     private void saveCurrentTaskAndCloseDialog() {

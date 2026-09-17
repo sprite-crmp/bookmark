@@ -183,4 +183,19 @@
         </FrameLayout>
 
     </LinearLayout>
+
+    <!-- Global touch blocker: transparent, covers everything -->
+    <View
+        android:id="@+id/global_touch_blocker"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/transparent"
+        android:clickable="true"
+        android:focusable="true"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

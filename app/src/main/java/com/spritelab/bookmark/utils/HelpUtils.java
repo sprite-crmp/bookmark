@@ -40,6 +40,8 @@ public class HelpUtils {
 
             @Override
             public boolean onTouch(View v, MotionEvent event) {
+                if (!v.isEnabled()) return false;
+
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
                         isPressed = true;
