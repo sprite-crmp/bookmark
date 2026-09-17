@@ -1,9 +1,12 @@
 package com.spritelab.bookmark.fragment;
 
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.OvershootInterpolator;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -16,6 +19,7 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.kongzue.dialogx.dialogs.PopTip;
 import com.spritelab.bookmark.R;
 import com.spritelab.bookmark.adapter.DialogPointsAdapter;
 import com.spritelab.bookmark.adapter.TasksAdapter;
@@ -39,6 +43,7 @@ public class TasksFragment extends Fragment {
     private RecyclerView rvDialogPoints;
     private EditText etBookMarkInner;
     private ImageView btnSendInner;
+    private View btnCancel;
 
     private TasksAdapter adapter;
     private DialogPointsAdapter dialogPointsAdapter;
@@ -47,6 +52,7 @@ public class TasksFragment extends Fragment {
     private final List<TaskModel> tasks = new ArrayList<>();
     private final List<TaskPointModel> currentNewPoints = new ArrayList<>();
     private String currentTaskTitle = "";
+    private boolean cooldown = false;
 
     public TasksFragment() {}
 
@@ -65,6 +71,9 @@ public class TasksFragment extends Fragment {
         rvDialogPoints = view.findViewById(R.id.rvDialogPoints);
         etBookMarkInner = view.findViewById(R.id.etBookMark);
         btnSendInner = view.findViewById(R.id.btn_send);
+        btnCancel = view.findViewById(R.id.btn_cancel);
+        
+        dialogAddTask.setVisibility(View.GONE);
 
         setupRecyclerView();
         setupDialogRecyclerView();
@@ -73,6 +82,10 @@ public class TasksFragment extends Fragment {
         HelpUtils.setupDropAnimation(btnSendInner, false, () -> {
             String text = etBookMarkInner.getText().toString().trim();
             onSendPressed(text);
+        }, () -> {});
+
+        HelpUtils.setupDropAnimation(btnCancel, false, () -> {
+            hideDialog();
         }, () -> {});
     }
 
@@ -130,21 +143,81 @@ public class TasksFragment extends Fragment {
 
     public void onSendPressed(String text) {
         if (!isDialogVisible()) {
-            if (text.isEmpty()) return;
+            if (text.isEmpty()) {
+                showCooldownTip("Введите название задачи");
+                return;
+            }
+            if (text.length() <= 3) {
+                showCooldownTip("Название слишком короткое");
+                return;
+            }
             currentTaskTitle = text;
             currentNewPoints.clear();
             dialogPointsAdapter.notifyDataSetChanged();
             tvNameTask.setText(currentTaskTitle);
-            dialogAddTask.setVisibility(View.VISIBLE);
+            etBookMarkInner.setText("");
+            showDialog();
         } else {
             if (text.isEmpty()) {
+                if (currentNewPoints.isEmpty()) {
+                    showCooldownTip("Добавьте хотя бы один пункт");
+                    return;
+                }
                 saveCurrentTaskAndCloseDialog();
             } else {
                 currentNewPoints.add(new TaskPointModel(text, false));
                 dialogPointsAdapter.notifyItemInserted(currentNewPoints.size() - 1);
                 etBookMarkInner.setText("");
+                rvDialogPoints.smoothScrollToPosition(currentNewPoints.size() - 1);
             }
         }
+    }
+
+    private void showCooldownTip(String message) {
+        if (cooldown) return;
+        cooldown = true;
+        new CountDownTimer(3000, 1000) {
+            @Override
+            public void onFinish() {
+                cooldown = false;
+            }
+
+            @Override
+            public void onTick(long millisUntilFinished) {
+            }
+        }.start();
+        PopTip.show(message).iconWarning();
+    }
+
+    private void showDialog() {
+        dialogAddTask.setScaleX(0.8f);
+        dialogAddTask.setScaleY(0.8f);
+        dialogAddTask.setAlpha(0f);
+        dialogAddTask.setVisibility(View.VISIBLE);
+        dialogAddTask.animate()
+                .scaleX(1f)
+                .scaleY(1f)
+                .alpha(1f)
+                .setDuration(250)
+                .setInterpolator(new OvershootInterpolator(1.2f))
+                .start();
+    }
+
+    private void hideDialog() {
+        dialogAddTask.animate()
+                .scaleX(0.8f)
+                .scaleY(0.8f)
+                .alpha(0f)
+                .setDuration(200)
+                .setInterpolator(new AccelerateInterpolator())
+                .withEndAction(() -> {
+                    dialogAddTask.setVisibility(View.GONE);
+                    etBookMarkInner.setText("");
+                    currentTaskTitle = "";
+                    currentNewPoints.clear();
+                    dialogPointsAdapter.notifyDataSetChanged();
+                })
+                .start();
     }
 
     private void saveCurrentTaskAndCloseDialog() {
@@ -155,11 +228,7 @@ public class TasksFragment extends Fragment {
         TaskModel newTask = new TaskModel(currentTaskTitle, "Дата создания: " + dateTime, new ArrayList<>(currentNewPoints));
         DatabaseHelper.getInstance(getContext()).addTask(newTask);
 
-        dialogAddTask.setVisibility(View.GONE);
-        etBookMarkInner.setText("");
-        currentTaskTitle = "";
-        currentNewPoints.clear();
-
+        hideDialog();
         loadFromDb();
     }
 }

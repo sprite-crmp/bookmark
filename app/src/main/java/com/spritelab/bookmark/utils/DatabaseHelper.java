@@ -19,23 +19,19 @@ import java.util.List;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "bookmark.db";
-    private static final int DATABASE_VERSION = 2; // Upgraded version to invoke onUpgrade
+    private static final int DATABASE_VERSION = 2;
 
-    // Tables
     private static final String TABLE_CONFIG = "config";
     private static final String TABLE_BOOKMARKS = "bookmarks";
     private static final String TABLE_TASKS = "tasks";
 
-    // Config
     private static final String CONF_ID = "id";
     private static final String CONF_THEME = "theme";
 
-    // Notes
     private static final String BOOK_ID = "id";
     private static final String BOOK_TITLE = "title";
     private static final String BOOK_DATE = "date";
 
-    // Tasks
     private static final String TASK_ID = "id";
     private static final String TASK_TITLE = "title";
     private static final String TASK_DATE = "date";
@@ -58,26 +54,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String createConfig = "CREATE TABLE " + TABLE_CONFIG + "(" +
-                CONF_ID + " INTEGER PRIMARY KEY, " +
-                CONF_THEME + " INTEGER DEFAULT 2)";
-        
-        String createBookmarks = "CREATE TABLE " + TABLE_BOOKMARKS + "(" +
-                BOOK_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                BOOK_TITLE + " TEXT, " +
-                BOOK_DATE + " TEXT)";
-
-        String createTasks = "CREATE TABLE " + TABLE_TASKS + "(" +
-                TASK_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                TASK_TITLE + " TEXT, " +
-                TASK_DATE + " TEXT, " +
-                TASK_POINTS + " TEXT, " +
-                TASK_STATUS + " INTEGER DEFAULT 0)";
-
-        db.execSQL(createConfig);
-        db.execSQL(createBookmarks);
-        db.execSQL(createTasks);
-
+        db.execSQL("CREATE TABLE " + TABLE_CONFIG + "(" + CONF_ID + " INTEGER PRIMARY KEY, " + CONF_THEME + " INTEGER DEFAULT 2)");
+        db.execSQL("CREATE TABLE " + TABLE_BOOKMARKS + "(" + BOOK_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + BOOK_TITLE + " TEXT, " + BOOK_DATE + " TEXT)");
+        db.execSQL("CREATE TABLE " + TABLE_TASKS + "(" + TASK_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + TASK_TITLE + " TEXT, " + TASK_DATE + " TEXT, " + TASK_POINTS + " TEXT, " + TASK_STATUS + " INTEGER DEFAULT 0)");
         db.execSQL("INSERT INTO " + TABLE_CONFIG + " (" + CONF_ID + ", " + CONF_THEME + ") VALUES (1, 2)");
     }
 
@@ -99,15 +78,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public int getTheme() {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.query(TABLE_CONFIG, new String[]{CONF_THEME}, CONF_ID + " = 1", null, null, null, null);
-        int theme = 2; // Default system
+        int theme = 2;
         if (cursor != null && cursor.moveToFirst()) {
             theme = cursor.getInt(0);
             cursor.close();
         }
         return theme;
     }
-
-    // --- Bookmarks (Notes) ---
 
     public long addBookmark(BookmarkModel bookmark) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -120,16 +97,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public List<BookmarkModel> getAllBookmarks() {
         List<BookmarkModel> list = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_BOOKMARKS + " ORDER BY " + BOOK_ID + " DESC", null);
-
+        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_BOOKMARKS + " ORDER BY " + BOOK_ID + " ASC", null);
         if (cursor.moveToFirst()) {
             do {
-                BookmarkModel b = new BookmarkModel(
-                        cursor.getInt(0),
-                        cursor.getString(1),
-                        cursor.getString(2)
-                );
-                list.add(b);
+                list.add(new BookmarkModel(cursor.getInt(0), cursor.getString(1), cursor.getString(2)));
             } while (cursor.moveToNext());
         }
         cursor.close();
@@ -150,15 +121,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 ContentValues v = new ContentValues();
                 v.put(BOOK_TITLE, b.getTitle());
                 v.put(BOOK_DATE, b.getDate());
-                db.insert(TABLE_BOOKMARKS, null, v);
+                long newId = db.insert(TABLE_BOOKMARKS, null, v);
+                b.setId((int) newId);
             }
             db.setTransactionSuccessful();
         } finally {
             db.endTransaction();
         }
     }
-
-    // --- Tasks ---
 
     public long addTask(TaskModel task) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -173,23 +143,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public List<TaskModel> getAllTasks() {
         List<TaskModel> list = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_TASKS + " ORDER BY " + TASK_ID + " DESC", null);
-
+        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_TASKS + " ORDER BY " + TASK_ID + " ASC", null);
         if (cursor.moveToFirst()) {
             Type type = new TypeToken<List<TaskPointModel>>(){}.getType();
             do {
                 String pointsJson = cursor.getString(3);
                 List<TaskPointModel> points = gson.fromJson(pointsJson, type);
-                if (points == null) {
-                    points = new ArrayList<>();
-                }
-                TaskModel t = new TaskModel(
-                        cursor.getInt(0),
-                        cursor.getString(1),
-                        cursor.getString(2),
-                        points
-                );
-                list.add(t);
+                if (points == null) points = new ArrayList<>();
+                list.add(new TaskModel(cursor.getInt(0), cursor.getString(1), cursor.getString(2), points));
             } while (cursor.moveToNext());
         }
         cursor.close();
@@ -220,7 +181,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 v.put(TASK_TITLE, t.getTitle());
                 v.put(TASK_DATE, t.getDate());
                 v.put(TASK_POINTS, gson.toJson(t.getPoints()));
-                db.insert(TABLE_TASKS, null, v);
+                long newId = db.insert(TABLE_TASKS, null, v);
+                t.setId((int) newId);
             }
             db.setTransactionSuccessful();
         } finally {

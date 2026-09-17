@@ -6,9 +6,11 @@
 
     <color name="transparent">#00000000</color>
     <color name="black">#FF000000</color>
+    <color name="black_transp">#BC4D2525</color>
     <color name="low_black">#222222</color>
     <color name="white">#FFFFFFFF</color>
     <color name="smoky">#f5f3f4</color>
     <color name="beard">#99D3D3D3</color>
     <color name="aluminum">#48818181</color>
+    <color name="aluminum_dialog">#282828</color>
 </resources>
