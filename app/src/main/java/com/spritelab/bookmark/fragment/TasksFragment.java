@@ -1,12 +1,15 @@
 package com.spritelab.bookmark.fragment;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.OvershootInterpolator;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -31,13 +34,11 @@ import com.spritelab.bookmark.utils.HelpUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
 public class TasksFragment extends Fragment {
-    private static final String TAG = "class:TasksFragment";
 
     private RecyclerView rvTasks;
     private ConstraintLayout dialogAddTask;
@@ -79,6 +80,7 @@ public class TasksFragment extends Fragment {
         btnCancel = view.findViewById(R.id.btn_cancel);
         
         if (getActivity() != null) {
+            getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
             globalTouchBlocker = getActivity().findViewById(R.id.global_blocker);
         }
         
@@ -234,6 +236,14 @@ public class TasksFragment extends Fragment {
     }
 
     private void showDialog() {
+        if (getActivity() != null) {
+            getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING);
+            InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+            if (imm != null && getView() != null) {
+                imm.hideSoftInputFromWindow(getView().getWindowToken(), 0);
+            }
+        }
+
         if (globalTouchBlocker != null) {
             globalTouchBlocker.setVisibility(View.VISIBLE);
         }
@@ -256,6 +266,10 @@ public class TasksFragment extends Fragment {
     }
 
     private void hideDialog() {
+        if (getActivity() != null) {
+            getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+        }
+
         if (globalTouchBlocker != null) {
             globalTouchBlocker.setVisibility(View.GONE);
         }
