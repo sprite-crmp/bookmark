@@ -67,6 +67,31 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.ViewHolder> 
         InnerPointsAdapter innerPointsAdapter = new InnerPointsAdapter(inflater.getContext(), task, null);
         holder.rvTaskPoints.setAdapter(innerPointsAdapter);
 
+        // Remove any existing helper to prevent multiple attachments
+        if (holder.innerItemTouchHelper != null) {
+            holder.innerItemTouchHelper.attachToRecyclerView(null);
+        }
+
+        // Add swipe to delete for inner points
+        ItemTouchHelper.SimpleCallback swipeCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                int pointPosition = viewHolder.getAdapterPosition();
+                if (pointPosition != RecyclerView.NO_POSITION) {
+                    task.getPoints().remove(pointPosition);
+                    innerPointsAdapter.notifyItemRemoved(pointPosition);
+                    DatabaseHelper.getInstance(inflater.getContext()).updateTask(task);
+                }
+            }
+        };
+        holder.innerItemTouchHelper = new ItemTouchHelper(swipeCallback);
+        holder.innerItemTouchHelper.attachToRecyclerView(holder.rvTaskPoints);
+
         HelpUtils.setupDropAnimation(holder.itemView, false,
                 () -> {
                     MessageDialog.show("Подтверждение", "Удалить задачу из списка?",
@@ -110,6 +135,7 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.ViewHolder> 
         TextView tvName;
         TextView tvDate;
         RecyclerView rvTaskPoints;
+        ItemTouchHelper innerItemTouchHelper;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);

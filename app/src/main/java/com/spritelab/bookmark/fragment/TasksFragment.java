@@ -78,7 +78,7 @@ public class TasksFragment extends Fragment {
         btnCancel = view.findViewById(R.id.btn_cancel);
         
         if (getActivity() != null) {
-            globalTouchBlocker = getActivity().findViewById(R.id.global_touch_blocker);
+            globalTouchBlocker = getActivity().findViewById(R.id.global_blocker);
         }
         
         dialogAddTask.setVisibility(View.GONE);
@@ -117,6 +117,7 @@ public class TasksFragment extends Fragment {
         adapter = new TasksAdapter(getContext(), tasks);
         rvTasks.setAdapter(adapter);
 
+        // Main tasks list: Only UP/DOWN for drag, NO SWIPE (user doesn't want whole task deleted by swipe)
         ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN, 0) {
             @Override
             public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
@@ -150,6 +151,24 @@ public class TasksFragment extends Fragment {
         rvDialogPoints.setLayoutManager(new LinearLayoutManager(getContext()));
         dialogPointsAdapter = new DialogPointsAdapter(getContext(), currentNewPoints);
         rvDialogPoints.setAdapter(dialogPointsAdapter);
+
+        // Swipe to delete for points being created in the dialog
+        ItemTouchHelper.SimpleCallback swipeCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                int position = viewHolder.getAdapterPosition();
+                if (position != RecyclerView.NO_POSITION) {
+                    currentNewPoints.remove(position);
+                    dialogPointsAdapter.notifyItemRemoved(position);
+                }
+            }
+        };
+        new ItemTouchHelper(swipeCallback).attachToRecyclerView(rvDialogPoints);
     }
 
     private void loadFromDb() {
